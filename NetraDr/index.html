@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetraDR — AI-Powered Diabetic Retinopathy Screening</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Three.js for 3D -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- GSAP for animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+</head>
+<body>
+
+    <!-- ========== CURSOR FOLLOWER ========== -->
+    <div class="cursor-follower" id="cursorFollower"></div>
+    <div class="cursor-dot" id="cursorDot"></div>
+
+    <!-- ========== LOADING SCREEN ========== -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader-content">
+            <div class="eye-loader">
+                <div class="eye-outer">
+                    <div class="eye-inner">
+                        <div class="eye-pupil"></div>
+                    </div>
+                </div>
+                <div class="scan-line"></div>
+            </div>
+            <h2 class="loader-text">NetraDR</h2>
+            <p class="loader-subtext">Initializing AI Systems...</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== 3D BACKGROUND CANVAS ========== -->
+    <canvas id="bgCanvas"></canvas>
+
+    <!-- ========== NAVIGATION ========== -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-logo">
+                <div class="logo-icon">
+                    <i class="fas fa-eye"></i>
+                </div>
+                <span class="logo-text">Netra<span class="logo-highlight">DR</span></span>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#home" class="nav-link active">Home</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
+                <li><a href="#features" class="nav-link">Features</a></li>
+                <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+                <li><a href="#ai-engine" class="nav-link">AI Engine</a></li>
+                <li><a href="#rural" class="nav-link">Rural India</a></li>
+                <li><a href="#languages" class="nav-link">Languages</a></li>
+                <li><a href="#security" class="nav-link">Security</a></li>
+                <li><a href="#scalability" class="nav-link">Scale</a></li>
+                <li><a href="#team" class="nav-link">Team</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="btn-demo" onclick="scrollToSection('how-it-works')">
+                    <span>Live Demo</span>
+                    <i class="fas fa-play"></i>
+                </button>
+                <div class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ========== HERO SECTION ========== -->
+    <section class="hero" id="home">
+        <div class="hero-particles" id="heroParticles"></div>
+        <div class="hero-content">
+            <div class="hero-badge animate-on-scroll">
+                <div class="badge-dot"></div>
+                <span>Smart India Hackathon 2024</span>
+            </div>
+            <h1 class="hero-title animate-on-scroll">
+                <span class="title-line">AI-Powered</span>
+                <span class="title-line gradient-text">Diabetic Retinopathy</span>
+                <span class="title-line">Screening for <span class="highlight-india">India</span></span>
+            </h1>
+            <p class="hero-description animate-on-scroll">
+                NetraDR brings advanced retinal screening to every corner of India — 
+                from metropolitan hospitals to the most remote primary health centres. 
+                Affordable. Accessible. Explainable.
+            </p>
+            <div class="hero-buttons animate-on-scroll">
+                <button class="btn-primary" onclick="scrollToSection('how-it-works')">
+                    <span>Start Screening</span>
+                    <div class="btn-shine"></div>
+                </button>
+                <button class="btn-secondary" onclick="scrollToSection('about')">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Learn More</span>
+                </button>
+            </div>
+            <div class="hero-stats animate-on-scroll">
+                <div class="stat-item">
+                    <div class="stat-number" data-count="77">0</div>
+                    <div class="stat-suffix">M+</div>
+                    <div class="stat-label">Diabetic Indians at Risk</div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <div class="stat-number" data-count="16">0</div>
+                    <div class="stat-suffix">+</div>
+                    <div class="stat-label">Indian Languages</div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <div class="stat-number" data-count="5">0</div>
+                    <div class="stat-suffix"></div>
+                    <div class="stat-label">DR Classification Grades</div>
+                </div>
+            </div>
+        </div>
+        <div class="hero-visual animate-on-scroll">
+            <div class="eye-3d-container" id="eye3DContainer"></div>
+            <div class="floating-cards">
+                <div class="float-card card-1">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>AI Screening</span>
+                </div>
+                <div class="float-card card-2">
+                    <i class="fas fa-language"></i>
+                    <span>16+ Languages</span>
+                </div>
+                <div class="float-card card-3">
+                    <i class="fas fa-wifi"></i>
+                    <span>Rural Ready</span>
+                </div>
+                <div class="float-card card-4">
+                    <i class="fas fa-brain"></i>
+                    <span>Explainable AI</span>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <div class="mouse">
+                <div class="mouse-wheel"></div>
+            </div>
+            <span>Scroll to explore</span>
+        </div>
+    </section>
+
+    <!-- ========== ABOUT SECTION ========== -->
+    <section class="section about-section" id="about">
+        <div class="section-container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-tag">The Problem</span>
+                <h2 class="section-title">Why <span class="gradient-text">NetraDR</span> Exists</h2>
+                <p class="section-subtitle">India has the second-largest diabetic population in the world. 
+                Diabetic Retinopathy is the leading cause of preventable blindness — yet most cases go undetected 
+                until vision loss is irreversible.</p>
+            </div>
+            <div class="about-grid">
+                <div class="about-card animate-on-scroll" data-delay="0">
+                    <div class="card-icon red">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h3>The Crisis</h3>
+                    <p>Over 77 million Indians have diabetes. Nearly 1 in 3 will develop some form of Diabetic Retinopathy. 
+                    Most don't know until it's too late.</p>
+                    <div class="card-glow red"></div>
+                </div>
+                <div class="about-card animate-on-scroll" data-delay="1">
+                    <div class="card-icon orange">
+                        <i class="fas fa-hospital"></i>
+                    </div>
+                    <h3>The Gap</h3>
+                    <p>India has approximately 1 ophthalmologist per 100,000 people. In rural areas, the ratio is 
+                    even worse. Screening infrastructure barely exists outside cities.</p>
+                    <div class="card-glow orange"></div>
+                </div>
+                <div class="about-card animate-on-scroll" data-delay="2">
+                    <div class="card-icon green">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <h3>The Solution</h3>
+                    <p>NetraDR uses AI to bring retinal screening to primary health centres, screening camps, 
+                    and remote locations — making early detection accessible and affordable.</p>
+                    <div class="card-glow green"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== FEATURES SECTION ========== -->
+    <section class="section features-section" id="features">
+        <div class="section-container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-tag">Capabilities</span>
+                <h2 class="section-title">Complete <span class="gradient-text">Feature Set</span></h2>
+                <p class="section-subtitle">Every feature designed for real-world deployment in Indian healthcare settings</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card animate-on-scroll" data-delay="0">
+                    <div class="feature-icon-wrap">
+                        <div class="feature-icon">
+                            <i class="fas fa-camera-retro"></i>
+                        </div>
+                        <div class="feature-status working">Working</div>
+                    </div>
+                    <h3>Retinal Image Capture</h3>
+                    <p>Upload or capture retinal fundus images with built-in format, size, and resolution validation</p>
+                </div>
+                <div class="feature-card animate-on-scroll" data-delay="1">
+                    <div class="feature-icon-wrap">
+                        <div class="feature-icon">
+                            <i class="fas fa-check-double"></i>
+                        </div>
+                        <div class="feature-status working">Working</div>
+                    </div>
+                    <h3>Image Quality Gate</h3>
+                    <p>Blur detection, brightness check, field-of-view validation, artifact detection — before AI processes the image</p>
+                </div>
+                <div class="feature-card animate-on-scroll" data-delay="2">
+                    <div class="feature-icon-wrap">
+                        <div class="feature-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <div class="feature-status working">Working</div>
+                    </div>
+                    <h3>AI DR Classification</h3>
+                    <p>5-grade classification: No DR, Mild NPDR, Moderate NPDR, Severe NPDR, Proliferative DR + Ungradable</p>
+                </div>
+                <div class="feature-card animate-on-scroll" data-delay="3">
+                    <div class="feature-icon-wrap">
+                        <div class="feature-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <div class="feature-status working">Working</div>
+                    </div>
+                    <h3>Grad-CAM Explainability</h3>
+                    <p>Visual heatmaps showing which retinal regions influenced the AI decision — with adjustable opacity and zoom</p>
+                </div>
+                <div class="feature-card animate-on-scroll" data-delay="4">
+                    <div class="feature-icon-wrap">
+                        <div class="feature-icon">
+                            <i class="fas fa-language"></i>
+                        </div>
+                        <div class="feature-status working">Working</div>
+                    </div>
+                    <h3>16+ Indian Languages</h3>
+                    <p>Hindi, Bengali, Tamil, Telugu, Kannada, Malayalam, Marathi, Gujarati, Punjabi, Urdu, Odia, Assamese & more</p>
+                </div>
+                <div class="feature-card animate-on-scroll" data-delay="5">
+                    <div class="feature-icon-wrap">
+                        <div class="feature-icon">
+                            <i class="fas fa-signal"></i>
+                        </div>
+                        <div class="feature-status working">Working</div>
+                    </div>
+                    <h3>Rural / Low-Bandwidth</h3>
+                    <p>Optimized for slow internet, image compression, network retry, queue-based uploads, sync architecture</p>
+                </div>
+                <div class="feature-card animate-on-scroll" data-delay="6">
+                    <div class="feature-icon-wrap">
+                        <div class="feature-icon">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <div class="feature-status working">Working</div>
+                    </div>
+                    <h3>Human-in-the-Loop</h3>
+                    <p>Every AI result goes through professional clinical review. AI assists — humans decide.</p>
+                </div>
+                <div class="feature-card animate-on-scroll" data-delay="7">
+                    <div class="feature-icon-wrap">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="feature-status working">Working</div>
+                    </div>
+                    <h3>Security & Privacy</h3>
+                    <p>Consent, encryption, RBAC, secure storage, audit logs, data minimization, HTTPS everywhere</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== HOW IT WORKS SECTION ========== -->
+    <section class="section how-section" id="how-it-works">
+        <div class="section-container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-tag">Workflow</span>
+                <h2 class="section-title">How <span class="gradient-text">Screening Works</span></h2>
+                <p class="section-subtitle">From patient registration to clinical decision — a complete, safe pipeline</p>
+            </div>
+            <div class="workflow-timeline">
+                <div class="timeline-line"></div>
+                <div class="timeline-progress" id="timelineProgress"></div>
+                
+                <div class="workflow-step animate-on-scroll" data-step="1">
+                    <div class="step-connector">
+                        <div class="step-number">01</div>
+                    </div>
+                    <div class="step-content">
+                        <div class="step-icon"><i class="fas fa-user-plus"></i></div>
+                        <h3>Patient Registration</h3>
+                        <p>Patient registers with basic information, selects preferred language, and provides informed consent for AI-assisted screening.</p>
+                        <div class="step-tags">
+                            <span class="tag">Consent</span>
+                            <span class="tag">Language Selection</span>
+                            <span class="tag">Privacy</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-step animate-on-scroll" data-step="2">
+                    <div class="step-connector">
+                        <div class="step-number">02</div>
+                    </div>
+                    <div class="step-content">
+                        <div class="step-icon"><i class="fas fa-camera"></i></div>
+                        <h3>Retinal Image Capture</h3>
+                        <p>Retinal fundus image is captured using compatible camera or uploaded. System validates format, size, and basic integrity.</p>
+                        <div class="step-tags">
+                            <span class="tag">Upload/Capture</span>
+                            <span class="tag">Format Check</span>
+                            <span class="tag">Size Validation</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-step animate-on-scroll" data-step="3">
+                    <div class="step-connector">
+                        <div class="step-number">03</div>
+                    </div>
+                    <div class="step-content">
+                        <div class="step-icon"><i class="fas fa-search"></i></div>
+                        <h3>Image Quality Gate</h3>
+                        <p>Automated checks for blur, brightness, field-of-view, artifacts. Poor quality → recapture requested. No bad image reaches AI.</p>
+                        <div class="step-tags">
+                            <span class="tag critical">Critical Safety Step</span>
+                            <span class="tag">Blur Check</span>
+                            <span class="tag">Brightness</span>
+                            <span class="tag">Artifacts</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-step animate-on-scroll" data-step="4">
+                    <div class="step-connector">
+                        <div class="step-number">04</div>
+                    </div>
+                    <div class="step-content">
+                        <div class="step-icon"><i class="fas fa-cogs"></i></div>
+                        <h3>Preprocessing</h3>
+                        <p>Image undergoes normalization, denoising, and CLAHE contrast enhancement to standardize input for the AI model.</p>
+                        <div class="step-tags">
+                            <span class="tag">Normalization</span>
+                            <span class="tag">Denoising</span>
+                            <span class="tag">CLAHE</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-step animate-on-scroll" data-step="5">
+                    <div class="step-connector">
+                        <div class="step-number">05</div>
+                    </div>
+                    <div class="step-content">
+                        <div class="step-icon"><i class="fas fa-brain"></i></div>
+                        <h3>AI Screening</h3>
+                        <p>Deep learning model classifies the image into DR grades. Confidence score displayed only if the model genuinely provides it.</p>
+                        <div class="step-tags">
+                            <span class="tag">5-Grade Classification</span>
+                            <span class="tag">Confidence</span>
+                            <span class="tag">Model Versioning</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-step animate-on-scroll" data-step="6">
+                    <div class="step-connector">
+                        <div class="step-number">06</div>
+                    </div>
+                    <div class="step-content">
+                        <div class="step-icon"><i class="fas fa-fire"></i></div>
+                        <h3>Grad-CAM Explanation</h3>
+                        <p>Heatmap overlay shows which regions influenced the AI. Zoom, pan, adjustable opacity. Patient-friendly + clinician explanations.</p>
+                        <div class="step-tags">
+                            <span class="tag">Heatmap</span>
+                            <span class="tag">Overlay</span>
+                            <span class="tag">ROI Explanation</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-step animate-on-scroll" data-step="7">
+                    <div class="step-connector">
+                        <div class="step-number">07</div>
+                    </div>
+                    <div class="step-content">
+                        <div class="step-icon"><i class="fas fa-user-md"></i></div>
+                        <h3>Professional Review</h3>
+                        <p>A qualified healthcare professional reviews every AI result. AI assists screening — the clinical decision is always human.</p>
+                        <div class="step-tags">
+                            <span class="tag critical">Human-in-the-Loop</span>
+                            <span class="tag">Clinical Decision</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="workflow-step animate-on-scroll" data-step="8">
+                    <div class="step-connector">
+                        <div class="step-number">08</div>
+                    </div>
+                    <div class="step-content">
+                        <div class="step-icon"><i class="fas fa-hospital"></i></div>
+                        <h3>Referral & Follow-up</h3>
+                        <p>If needed, patient is referred to nearest verified eye-care provider. Follow-up scheduling and tracking included.</p>
+                        <div class="step-tags">
+                            <span class="tag">Referral</span>
+                            <span class="tag">Nearby Eye Care</span>
+                            <span class="tag">Follow-up</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== AI ENGINE SECTION ========== -->
+    <section class="section ai-section" id="ai-engine">
+        <div class="section-container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-tag">Technology</span>
+                <h2 class="section-title">The <span class="gradient-text">AI Engine</span></h2>
+                <p class="section-subtitle">Deep learning architecture designed for accurate, explainable DR screening</p>
+            </div>
+            <div class="ai-grid">
+                <div class="ai-visual animate-on-scroll">
+                    <div class="neural-network" id="neuralNetwork">
+                        <canvas id="nnCanvas"></canvas>
+                    </div>
+                    <div class="ai-specs">
+                        <div class="spec-item">
+                            <span class="spec-label">Classification</span>
+                            <span class="spec-value">5-Grade DR + Ungradable</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Explainability</span>
+                            <span class="spec-value">Grad-CAM Heatmaps</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Preprocessing</span>
+                            <span class="spec-value">CLAHE + Normalization + Denoising</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Quality Gate</span>
+                            <span class="spec-value">Multi-check Image Validation</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Clinical Validation</span>
+                            <span class="spec-value">Not yet completed</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="ai-categories animate-on-scroll">
+                    <h3>DR Classification Grades</h3>
+                    <div class="dr-grades">
+                        <div class="grade-item grade-0">
+                            <div class="grade-bar">
+                                <div class="grade-fill" style="width: 100%"></div>
+                            </div>
+                            <div class="grade-info">
+                                <span class="grade-name">No Apparent DR</span>
+                                <span class="grade-desc">No visible signs of diabetic retinopathy</span>
+                            </div>
+                        </div>
+                        <div class="grade-item grade-1">
+                            <div class="grade-bar">
+                                <div class="grade-fill" style="width: 80%"></div>
+                            </div>
+                            <div class="grade-info">
+                                <span class="grade-name">Mild NPDR</span>
+                                <span class="grade-desc">Microaneurysms only</span>
+                            </div>
+                        </div>
+                        <div class="grade-item grade-2">
+                            <div class="grade-bar">
+                                <div class="grade-fill" style="width: 60%"></div>
+                            </div>
+                            <div class="grade-info">
+                                <span class="grade-name">Moderate NPDR</span>
+                                <span class="grade-desc">More than microaneurysms but less than severe</span>
+                            </div>
+                        </div>
+                        <div class="grade-item grade-3">
+                            <div class="grade-bar">
+                                <div class="grade-fill" style="width: 40%"></div>
+                            </div>
+                            <div class="grade-info">
+                                <span class="grade-name">Severe NPDR</span>
+                                <span class="grade-desc">Extensive hemorrhages, venous beading</span>
+                            </div>
+                        </div>
+                        <div class="grade-item grade-4">
+                            <div class="grade-bar">
+                                <div class="grade-fill" style="width: 20%"></div>
+                            </div>
+                            <div class="grade-info">
+                                <span class="grade-name">Proliferative DR</span>
+                                <span class="grade-desc">Neovascularization, vitreous hemorrhage</span>
+                            </div>
+                        </div>
+                        <div class="grade-item grade-u">
+                            <div class="grade-bar">
+                                <div class="grade-fill" style="width: 10%"></div>
+                            </div>
+                            <div class="grade-info">
+                                <span class="grade-name">Ungradable</span>
+                                <span class="grade-desc">Image quality insufficient for grading</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ai-warning">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <p>AI screening is an assistive tool. All results require professional clinical review before any medical decision.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== RURAL INDIA SECTION ========== -->
+    <section class="section rural-section" id="rural">
+        <div class="section-container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-tag">Accessibility</span>
+                <h2 class="section-title">Built for <span class="gradient-text">Rural India</span></h2>
+                <p class="section-subtitle">Designed to work where it matters most — primary health centres, screening camps, and remote villages</p>
+            </div>
+            <div class="rural-grid">
+                <div class="rural-card animate-on-scroll">
+                    <div class="rural-icon"><i class="fas fa-signal"></i></div>
+                    <h3>Low Bandwidth Mode</h3>
+                    <p>Image compression, optimized API calls, minimal data transfer. Works on 2G/3G networks.</p>
+                </div>
+                <div class="rural-card animate-on-scroll">
+                    <div class="rural-icon"><i class="fas fa-sync-alt"></i></div>
+                    <h3>Sync Architecture</h3>
+                    <p>Queue-based uploads, failed-upload retry, resume interrupted workflows. No data loss.</p>
+                </div>
+                <div class="rural-card animate-on-scroll">
+                    <div class="rural-icon"><i class="fas fa-mobile-alt"></i></div>
+                    <h3>Mobile-First UI</h3>
+                    <p>Designed for smartphones and tablets. Simple interface for low-literacy users with voice guidance.</p>
+                </div>
+                <div class="rural-card animate-on-scroll">
+                    <div class="rural-icon"><i class="fas fa-user-nurse"></i></div>
+                    <h3>Healthcare Worker Mode</h3>
+                    <p>Trained ASHA/ANM workers can conduct screening with guided workflows. No specialist required on-site.</p>
+                </div>
+                <div class="rural-card animate-on-scroll">
+                    <div class="rural-icon"><i class="fas fa-campground"></i></div>
+                    <h3>Screening Camp Support</h3>
+                    <p>Mobile screening camp workflow architecture. Register → Screen → Results → Refer in a single session.</p>
+                </div>
+                <div class="rural-card animate-on-scroll">
+                    <div class="rural-icon"><i class="fas fa-video"></i></div>
+                    <h3>Tele-Ophthalmology</h3>
+                    <p>Remote specialist review architecture. Rural screening → City specialist review → Patient gets result.</p>
+                </div>
+            </div>
+            <div class="rural-map animate-on-scroll">
+                <div class="map-container">
+                    <div class="india-outline">
+                        <svg viewBox="0 0 500 600" class="india-svg">
+                            <path class="india-path" d="M250,50 C280,50 320,60 350,80 C380,100 400,130 410,160 C420,190 430,220 440,250 C450,280 445,310 430,340 C415,370 400,400 380,420 C360,440 340,460 310,480 C280,500 260,520 250,550 C240,520 220,500 190,480 C160,460 140,440 120,420 C100,400 85,370 70,340 C55,310 50,280 60,250 C70,220 80,190 90,160 C100,130 120,100 150,80 C180,60 220,50 250,50Z"/>
+                            <circle class="map-dot pulse-dot" cx="200" cy="200" r="5"/>
+                            <circle class="map-dot pulse-dot" cx="300" cy="250" r="5"/>
+                            <circle class="map-dot pulse-dot" cx="250" cy="350" r="5"/>
+                            <circle class="map-dot pulse-dot" cx="150" cy="300" r="5"/>
+                            <circle class="map-dot pulse-dot" cx="350" cy="180" r="5"/>
+                            <circle class="map-dot pulse-dot" cx="180" cy="400" r="5"/>
+                            <circle class="map-dot pulse-dot" cx="320" cy="400" r="5"/>
+                        </svg>
+                    </div>
+                    <div class="map-legend">
+                        <div class="legend-item">
+                            <div class="legend-dot active"></div>
+                            <span>Target Deployment Areas</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot planned"></div>
+                            <span>PHC Network Coverage</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== LANGUAGES SECTION ========== -->
+    <section class="section languages-section" id="languages">
+        <div class="section-container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-tag">Inclusivity</span>
+                <h2 class="section-title"><span class="gradient-text">16+ Indian Languages</span></h2>
+                <p class="section-subtitle">Healthcare should never be limited by language barriers</p>
+            </div>
+            <div class="languages-showcase animate-on-scroll">
+                <div class="lang-orbit">
+                    <div class="lang-center">
+                        <i class="fas fa-globe-asia"></i>
+                        <span>NetraDR</span>
+                    </div>
+                    <div class="lang-item" style="--i:0"><span>English</span></div>
+                    <div class="lang-item" style="--i:1"><span>हिन्दी</span></div>
+                    <div class="lang-item" style="--i:2"><span>বাংলা</span></div>
+                    <div class="lang-item" style="--i:3"><span>தமிழ்</span></div>
+                    <div class="lang-item" style="--i:4"><span>తెలుగు</span></div>
+                    <div class="lang-item" style="--i:5"><span>ಕನ್ನಡ</span></div>
+                    <div class="lang-item" style="--i:6"><span>മലയാളം</span></div>
+                    <div class="lang-item" style="--i:7"><span>मराठी</span></div>
+                    <div class="lang-item" style="--i:8"><span>ગુજરાતી</span></div>
+                    <div class="lang-item" style="--i:9"><span>ਪੰਜਾਬੀ</span></div>
+                    <div class="lang-item" style="--i:10"><span>اردو</span></div>
+                    <div class="lang-item" style="--i:11"><span>ଓଡ଼ିଆ</span></div>
+                    <div class="lang-item" style="--i:12"><span>অসমীয়া</span></div>
+                    <div class="lang-item" style="--i:13"><span>नेपाली</span></div>
+                    <div class="lang-item" style="--i:14"><span>कोंकणी</span></div>
+                    <div class="lang-item" style="--i:15"><span>संस्कृतम्</span></div>
+                </div>
+            </div>
+            <div class="lang-features animate-on-scroll">
+                <div class="lang-feat">
+                    <i class="fas fa-exchange-alt"></i>
+                    <h4>Language Switcher</h4>
+                    <p>Switch language anytime during the screening workflow</p>
+                </div>
+                <div class="lang-feat">
+                    <i class="fas fa-microphone"></i>
+                    <h4>Voice Architecture</h4>
+                    <p>Text-to-speech and speech-to-text architecture ready for expansion</p>
+                </div>
+                <div class="lang-feat">
+                    <i class="fas fa-plus-circle"></i>
+                    <h4>Expandable</h4>
+                    <p>Centralized translation system — add new languages without code changes</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== SECURITY SECTION ========== -->
+    <section class="section security-section" id="security">
+        <div class="section-container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-tag">Trust</span>
+                <h2 class="section-title">Security & <span class="gradient-text">Privacy</span></h2>
+                <p class="section-subtitle">Patient data protection is not optional — it's fundamental</p>
+            </div>
+            <div class="security-grid">
+                <div class="security-card animate-on-scroll">
+                    <div class="security-icon"><i class="fas fa-lock"></i></div>
+                    <h3>Encryption</h3>
+                    <p>HTTPS everywhere. Encrypted data at rest and in transit. Secure API communication.</p>
+                </div>
+                <div class="security-card animate-on-scroll">
+                    <div class="security-icon"><i class="fas fa-user-shield"></i></div>
+                    <h3>Role-Based Access</h3>
+                    <p>Patient → Healthcare Worker → Clinician → Admin. Each role sees only what it needs.</p>
+                </div>
+                <div class="security-card animate-on-scroll">
+                    <div class="security-icon"><i class="fas fa-file-signature"></i></div>
+                    <h3>Consent Management</h3>
+                    <p>Informed consent before any data collection or AI screening. Clear, multilingual consent flows.</p>
+                </div>
+                <div class="security-card animate-on-scroll">
+                    <div class="security-icon"><i class="fas fa-clipboard-list"></i></div>
+                    <h3>Audit Trails</h3>
+                    <p>Complete audit logs. Data minimization. Retention and deletion policies. Transparent data handling.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== SCALABILITY SECTION ========== -->
+    <section class="section scale-section" id="scalability">
+        <div class="section-container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-tag">Growth</span>
+                <h2 class="section-title">Scalability <span class="gradient-text">Architecture</span></h2>
+                <p class="section-subtitle">From a single screening location to a nationwide deployment</p>
+            </div>
+            <div class="scale-pyramid animate-on-scroll">
+                <div class="pyramid-level level-6">
+                    <div class="level-content">
+                        <span class="level-icon">🇮🇳</span>
+                        <span class="level-text">All India</span>
+                    </div>
+                </div>
+                <div class="pyramid-level level-5">
+                    <div class="level-content">
+                        <span class="level-icon">🗺️</span>
+                        <span class="level-text">Multi-State</span>
+                    </div>
+                </div>
+                <div class="pyramid-level level-4">
+                    <div class="level-content">
+                        <span class="level-icon">📍</span>
+                        <span class="level-text">State Level</span>
+                    </div>
+                </div>
+                <div class="pyramid-level level-3">
+                    <div class="level-content">
+                        <span class="level-icon">🏘️</span>
+                        <span class="level-text">District Level</span>
+                    </div>
+                </div>
+                <div class="pyramid-level level-2">
+                    <div class="level-content">
+                        <span class="level-icon">🏥</span>
+                        <span class="level-text">Multiple Clinics</span>
+                    </div>
+                </div>
+                <div class="pyramid-level level-1">
+                    <div class="level-content">
+                        <span class="level-icon">📌</span>
+                        <span class="level-text">Single Location</span>
+                    </div>
+                </div>
+            </div>
+            <div class="scale-features animate-on-scroll">
+                <div class="scale-feat">
+                    <i class="fas fa-server"></i>
+                    <span>Scalable Backend</span>
+                </div>
+                <div class="scale-feat">
+                    <i class="fas fa-database"></i>
+                    <span>Database Scaling</span>
+                </div>
+                <div class="scale-feat">
+                    <i class="fas fa-hdd"></i>
+                    <span>Image Storage</span>
+                </div>
+                <div class="scale-feat">
+                    <i class="fas fa-tasks"></i>
+                    <span>Queue Processing</span>
+                </div>
+                <div class="scale-feat">
+                    <i class="fas fa-code-branch"></i>
+                    <span>Model Versioning</span>
+                </div>
+                <div class="scale-feat">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Monitoring</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== AFFORDABILITY SECTION ========== -->
+    <section class="section afford-section" id="affordability">
+        <div class="section-container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-tag">Impact</span>
+                <h2 class="section-title">Affordable & <span class="gradient-text">Sustainable</span></h2>
+                <p class="section-subtitle">Cost should never be a barrier to preventing blindness</p>
+            </div>
+            <div class="afford-grid">
+                <div class="afford-card animate-on-scroll">
+                    <div class="afford-icon"><i class="fas fa-code"></i></div>
+                    <h3>Open-Source First</h3>
+                    <p>Built with open-source technologies wherever appropriate to minimize licensing costs</p>
+                </div>
+                <div class="afford-card animate-on-scroll">
+                    <div class="afford-icon"><i class="fas fa-compress-arrows-alt"></i></div>
+                    <h3>Efficient Infrastructure</h3>
+                    <p>Image compression, minimal bandwidth, scalable cloud — designed for cost efficiency</p>
+                </div>
+                <div class="afford-card animate-on-scroll">
+                    <div class="afford-icon"><i class="fas fa-users"></i></div>
+                    <h3>Shared Screening</h3>
+                    <p>Community screening camps, PHC integration, healthcare-worker-assisted model</p>
+                </div>
+                <div class="afford-card animate-on-scroll">
+                    <div class="afford-icon"><i class="fas fa-hand-holding-usd"></i></div>
+                    <h3>Funding Pathways</h3>
+                    <p>Government health programs, research grants, CSR, NGO partnerships, university innovation funds</p>
+                </div>
+            </div>
+            <div class="afford-note animate-on-scroll">
+                <i class="fas fa-info-circle"></i>
+                <p>Cost data will be populated after field validation and pilot deployment. No speculative pricing is displayed.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== TEAM SECTION ========== -->
+    <section class="section team-section" id="team">
+        <div class="section-container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-tag">People</span>
+                <h2 class="section-title">The <span class="gradient-text">Team</span></h2>
+                <p class="section-subtitle">Built with passion for accessible healthcare</p>
+            </div>
+            <div class="team-grid animate-on-scroll">
+                <div class="team-card">
+                    <div class="team-avatar">
+                        <div class="avatar-placeholder"><i class="fas fa-user"></i></div>
+                    </div>
+                    <h3>Team Member 1</h3>
+                    <p>Role / Specialization</p>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar">
+                        <div class="avatar-placeholder"><i class="fas fa-user"></i></div>
+                    </div>
+                    <h3>Team Member 2</h3>
+                    <p>Role / Specialization</p>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar">
+                        <div class="avatar-placeholder"><i class="fas fa-user"></i></div>
+                    </div>
+                    <h3>Team Member 3</h3>
+                    <p>Role / Specialization</p>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar">
+                        <div class="avatar-placeholder"><i class="fas fa-user"></i></div>
+                    </div>
+                    <h3>Team Member 4</h3>
+                    <p>Role / Specialization</p>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar">
+                        <div class="avatar-placeholder"><i class="fas fa-user"></i></div>
+                    </div>
+                    <h3>Team Member 5</h3>
+                    <p>Role / Specialization</p>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar">
+                        <div class="avatar-placeholder"><i class="fas fa-user"></i></div>
+                    </div>
+                    <h3>Team Member 6</h3>
+                    <p>Role / Specialization</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== TRANSPARENCY SECTION ========== -->
+    <section class="section transparency-section" id="transparency">
+        <div class="section-container">
+            <div class="section-header animate-on-scroll">
+                <span class="section-tag">Honesty</span>
+                <h2 class="section-title">Transparency & <span class="gradient-text">Limitations</span></h2>
+                <p class="section-subtitle">We believe responsible AI means being honest about what we can and cannot do</p>
+            </div>
+            <div class="transparency-grid animate-on-scroll">
+                <div class="trans-card honest">
+                    <h3><i class="fas fa-check-circle"></i> What NetraDR Does</h3>
+                    <ul>
+                        <li>AI-assisted screening for Diabetic Retinopathy</li>
+                        <li>Explainable AI with Grad-CAM visualizations</li>
+                        <li>Image quality validation before screening</li>
+                        <li>Multilingual, accessible interface</li>
+                        <li>Human-in-the-loop clinical review</li>
+                        <li>Rural-optimized low-bandwidth architecture</li>
+                    </ul>
+                </div>
+                <div class="trans-card limitations">
+                    <h3><i class="fas fa-exclamation-circle"></i> Current Limitations</h3>
+                    <ul>
+                        <li>Clinical validation — not yet completed</li>
+                        <li>Offline mode — to be validated</li>
+                        <li>Not all languages fully translated/tested</li>
+                        <li>AI model performance — to be benchmarked on Indian populations</li>
+                        <li>Regulatory approval — not obtained</li>
+                        <li>This is a prototype, not a certified medical device</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="status-legend animate-on-scroll">
+                <h3>Feature Status Legend</h3>
+                <div class="status-items">
+                    <div class="status-item">
+                        <div class="status-dot green"></div>
+                        <span>Working — Implemented and functional</span>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-dot yellow"></div>
+                        <span>Connected — Built but unvalidated</span>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-dot blue"></div>
+                        <span>Proposed — Architecture designed</span>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-dot red"></div>
+                        <span>Not implemented — Future scope</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-main">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <i class="fas fa-eye"></i>
+                        <span>Netra<span class="logo-highlight">DR</span></span>
+                    </div>
+                    <p>AI-Powered Diabetic Retinopathy Screening for India</p>
+                    <p class="footer-tagline">Smart India Hackathon 2024</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-col">
+                        <h4>Platform</h4>
+                        <a href="#features">Features</a>
+                        <a href="#how-it-works">How It Works</a>
+                        <a href="#ai-engine">AI Engine</a>
+                        <a href="#rural">Rural India</a>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Trust</h4>
+                        <a href="#security">Security</a>
+                        <a href="#transparency">Transparency</a>
+                        <a href="#scalability">Scalability</a>
+                        <a href="#affordability">Affordability</a>
+                    </div>
+                    <div class="footer-col">
+                        <h4>Connect</h4>
+                        <a href="#team">Team</a>
+                        <a href="#">GitHub</a>
+                        <a href="#">Contact</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 NetraDR. Built for Smart India Hackathon.</p>
+                <p class="disclaimer">NetraDR is a prototype AI-assisted screening tool. It is not a certified medical device. 
+                All screening results require professional clinical review.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
