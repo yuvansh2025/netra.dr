@@ -29,7 +29,7 @@ def load_model():
     if not os.path.exists(weights_path):
         with st.spinner("Downloading model weights from release..."):
             # REPLACE THIS URL WITH YOUR COPIED GITHUB RELEASE ASSET LINK:
-            url = "https://github.com/YOUR_USERNAME/sih-dr-screening/releases/download/v1.0/dr_resnet50_enhanced_weights.pth"
+            url = "https://github.com/yuvansh2025/netra.dr/releases/download/code/dr_resnet50_enhanced_weights.pth"
             urllib.request.urlretrieve(url, weights_path)
             
     device = torch.device('cpu') 
