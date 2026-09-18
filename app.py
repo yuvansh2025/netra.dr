@@ -18,7 +18,8 @@ st.title("Diabetic Retinopathy Multimodal Screening Suite")
 
 # 2. Configure Google AI Studio Securely via Streamlit Secrets
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-llm_model = genai.GenerativeModel("gemini-pro")
+llm_model = genai.GenerativeModel("gemini-2.5-flash")
+
 # 3. Model Downloader & Loader
 @st.cache_resource
 def load_model():
@@ -27,7 +28,7 @@ def load_model():
     # Auto-download weights from your GitHub release if not present
     if not os.path.exists(weights_path):
         with st.spinner("Downloading model weights from release..."):
-            # REPLACE THIS URL WITH YOUR COPIED GITHUB RELEASE ASSET LINK:
+            # REPLACE THIS URL WITH YOUR ACTUAL GITHUB RELEASE ASSET LINK:
             url = "https://github.com/yuvansh2025/netra.dr/releases/download/code/dr_resnet50_enhanced_weights.pth"
             urllib.request.urlretrieve(url, weights_path)
             
