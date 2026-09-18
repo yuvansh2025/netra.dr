@@ -18,8 +18,7 @@ st.title("Diabetic Retinopathy Multimodal Screening Suite")
 
 # 2. Configure Google AI Studio Securely via Streamlit Secrets
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-llm_model = genai.GenerativeModel("gemini-2.5-flash")
-
+llm_model = genai.GenerativeModel("gemini-3.6-flash")
 # 3. Model Downloader & Loader
 @st.cache_resource
 def load_model():
