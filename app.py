@@ -137,3 +137,23 @@ if uploaded_file is not None:
             st.write(response.text)
         except Exception as e:
             st.error(f"Error communicating with Google AI Studio: {str(e)}")
+
+
+
+import streamlit.components.v1 as components
+import json
+
+# Send result payload to parent NetraDR window
+payload = json.dumps({
+    "type": "NETRADR_SCAN_RESULT",
+    "stage": predicted_class_idx,
+    "confidence": round(confidence_score, 1),
+    "stageName": predicted_class_name,
+    "report": response.text if 'response' in locals() else ""
+})
+
+components.html(f"""
+<script>
+    window.parent.postMessage({payload}, "*");
+</script>
+""", height=0)
