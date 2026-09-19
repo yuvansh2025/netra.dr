@@ -11,6 +11,8 @@ from pytorch_grad_cam.utils.image import show_cam_on_image
 import google.generativeai as genai
 import os
 import urllib.request
+import streamlit.components.v1 as components
+import json
 
 # 1. Page Config
 st.set_page_config(page_title="DR Screening System", layout="wide")
@@ -140,10 +142,7 @@ if uploaded_file is not None:
         except Exception as e:
             st.error(f"Error communicating with Google AI Studio: {str(e)}")
 
-        # Send result payload to parent NetraDR website (MUST BE INDENTED HERE)
-        import streamlit.components.v1 as components
-        import json
-
+        # Send result payload to parent NetraDR website
         payload = json.dumps({
             "type": "NETRADR_SCAN_RESULT",
             "stage": predicted_class_idx,
@@ -157,42 +156,3 @@ if uploaded_file is not None:
             window.parent.postMessage({payload}, "*");
         </script>
         """, height=0)
-            
-        # Call Gemini AI
-        prompt = f"""
-        You are an ophthalmology clinical assistant. A deep learning diagnostic model analyzed a retinal fundus scan:
-        - Predicted Severity: {predicted_class_name}
-        - Confidence: {confidence_score:.2f}%
-        
-        Provide a concise clinical report:
-        1. Clinical Assessment: What this stage means pathologically.
-        2. Visual Heatmap Interpretation: Explain that the highlighted areas indicate regions of vascular abnormality.
-        3. Action Plan: Recommended clinical next steps.
-        Keep it strictly factual, professional, and under 150 words.
-        """
-        try:
-            response = llm_model.generate_content(prompt)
-            st.success("Google AI Studio: Diagnostic Report Generated")
-            st.write(response.text)
-        except Exception as e:
-            st.error(f"Error communicating with Google AI Studio: {str(e)}")
-
-
-
-import streamlit.components.v1 as components
-import json
-
-# Send result payload to parent NetraDR window
-payload = json.dumps({
-    "type": "NETRADR_SCAN_RESULT",
-    "stage": predicted_class_idx,
-    "confidence": round(confidence_score, 1),
-    "stageName": predicted_class_name,
-    "report": response.text if 'response' in locals() else ""
-})
-
-components.html(f"""
-<script>
-    window.parent.postMessage({payload}, "*");
-</script>
-""", height=0)
