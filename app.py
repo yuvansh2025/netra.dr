@@ -142,7 +142,7 @@ if uploaded_file is not None:
         except Exception as e:
             st.error(f"Error communicating with Google AI Studio: {str(e)}")
 
-        # Send result payload to parent NetraDR website
+        # Send result payload cleanly to parent NetraDR website via postMessage
         payload = json.dumps({
             "type": "NETRADR_SCAN_RESULT",
             "stage": predicted_class_idx,
